@@ -14,6 +14,7 @@
     "vite": "^7.1.0"
   },
   "dependencies": {
+    "lightweight-charts": "^5.0.8",
     "split-grid": "^1.0.11"
   }
 }

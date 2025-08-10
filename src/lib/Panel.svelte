@@ -25,7 +25,6 @@
       : [],
   );
   let splitData = $derived(templateArray ? calculateSplitData(templateArray) : null);
-  let showDefaultText = $derived(props.showDefaultText);
 
   // 用于存储 Split 实例，以便在更新时销毁旧实例
   let splitInstance = null;
@@ -79,8 +78,9 @@
   `}
 >
   {#each uniqueTemplateArray as item, index (item)}
+    {@const Component = props.children[index].component}
     <div class={item} style="grid-area: {formatGridArea(templateGrid[item])}; background-color: {hlsColors[index]};">
-      {showDefaultText ? item : ""}
+      <Component {...props.children[index].props} />
     </div>
   {/each}
 

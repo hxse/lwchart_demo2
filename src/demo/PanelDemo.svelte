@@ -1,39 +1,58 @@
 <script>
   import Panel from "../lib/Panel.svelte";
-
+  import Text from "./Text.svelte";
   import { removeURLParameter, returnHome } from "./utils/handleUrl.js";
 
   import { getContext } from "svelte";
 
   const demoObj = getContext("demoObj");
 
-  // 将 panelOptions 声明为响应式状态
-  let panelOptions = $state({
+  let panelOptions1 = {
     template: `a a b
-                c c b
-                d e e`,
+               c c b
+               d e e`,
     splitSize: "5px",
     gridTemplateColumns: "1fr 1fr 1fr",
     gridTemplateRows: "1fr 1fr 1fr",
     showDefaultColors: true,
-    showDefaultText: true,
-  });
+    children: [...Array(5).keys()].map((i) => ({ component: Text, props: { text: `layout 0 test ${i}` } })),
+  };
 
-  // 示例：在某个事件中修改 panelOptions
-  // 假设你有一个按钮，点击后改变 template
+  let panelOptions2 = {
+    template: `a b
+               a c`,
+    splitSize: "5px",
+    gridTemplateColumns: "1fr 1fr",
+    gridTemplateRows: "1fr 1fr",
+    showDefaultColors: true,
+    children: [...Array(3).keys()].map((i) => ({ component: Text, props: { text: `layout 1 test ${i}` } })),
+  };
+
+  let panelOptions = $state(panelOptions1);
+
   function changeTemplate() {
-    const t1 = `a a b
-                c c b
-                d e e`;
-    const c1 = "1fr 1fr 1fr";
-    const r1 = "1fr 1fr 1fr";
-    const t2 = `a b
-                a c`;
-    const c2 = "1fr 1fr";
-    const r2 = "1fr 1fr";
-    panelOptions.template = panelOptions.template == t1 ? t2 : t1;
-    panelOptions.gridTemplateColumns = panelOptions.gridTemplateColumns == c1 ? c2 : c1;
-    panelOptions.gridTemplateRows = panelOptions.gridTemplateRows == r1 ? r2 : r1;
+    const t1 = panelOptions1.template;
+    const c1 = panelOptions1.gridTemplateColumns;
+    const r1 = panelOptions1.gridTemplateRows;
+    const d1 = panelOptions1.children;
+
+    const t2 = panelOptions2.template;
+    const c2 = panelOptions2.gridTemplateColumns;
+    const r2 = panelOptions2.gridTemplateRows;
+    const d2 = panelOptions2.children;
+
+    if (panelOptions.template == t1) {
+      panelOptions.template = t2;
+      panelOptions.gridTemplateColumns = c2;
+      panelOptions.gridTemplateRows = r2;
+      panelOptions.children = d2;
+    } else {
+      panelOptions.template = t1;
+      panelOptions.gridTemplateColumns = c1;
+      panelOptions.gridTemplateRows = r1;
+      panelOptions.children = d1;
+    }
+
     console.log("Template changed to a new layout.");
   }
 </script>
