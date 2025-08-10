@@ -1,58 +1,100 @@
 <script>
-  import Panel from "./lib/Panel.svelte";
+  import PanelDemo from "./demo/PanelDemo.svelte";
+  import { onMount } from "svelte";
+  import { setContext } from "svelte";
 
-  // 将 panelOptions 声明为响应式状态
-  let panelOptions = $state({
-    template: `a a b
-                c c b
-                d e e`,
-    splitSize: "5px",
-    gridTemplateColumns: "1fr 1fr 1fr",
-    gridTemplateRows: "1fr 1fr 1fr",
-    showDefaultColors: true,
-    showDefaultText: true,
-  });
+  let demoObj = $state({ current: "" });
 
-  // 示例：在某个事件中修改 panelOptions
-  // 假设你有一个按钮，点击后改变 template
-  function changeTemplate() {
-    const t1 = `a a b
-                c c b
-                d e e`;
-    const c1 = "1fr 1fr 1fr";
-    const r1 = "1fr 1fr 1fr";
-    const t2 = `a b
-                a c`;
-    const c2 = "1fr 1fr";
-    const r2 = "1fr 1fr";
-    panelOptions.template = panelOptions.template == t1 ? t2 : t1;
-    panelOptions.gridTemplateColumns = panelOptions.gridTemplateColumns == c1 ? c2 : c1;
-    panelOptions.gridTemplateRows = panelOptions.gridTemplateRows == r1 ? r2 : r1;
-    console.log("Template changed to a new layout.");
+  setContext("demoObj", demoObj);
+
+  const demos = [
+    {
+      name: "PanelDemo",
+      component: PanelDemo,
+      title: "Panel Demo",
+      description: "简单的Panel组件演示",
+    },
+  ];
+
+  function getDemoFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    demoObj.current = urlParams.get("demo") || "";
   }
+
+  function navigateToDemo(demoName) {
+    const url = new URL(window.location.href);
+    if (demoName) {
+      url.searchParams.set("demo", demoName);
+    } else {
+      url.searchParams.delete("demo");
+    }
+    window.history.pushState({}, "", url.toString());
+    demoObj.current = demoName;
+  }
+
+  onMount(() => {
+    getDemoFromUrl();
+    window.addEventListener("popstate", getDemoFromUrl);
+  });
 </script>
 
 <main>
-  <div class="top-bar">
-    <button onclick={changeTemplate}>更改布局</button>
-  </div>
-  <div class="panel-container">
-    <Panel {...panelOptions} />
-  </div>
+  {#if demoObj.current}
+    {#each demos as demo}
+      {#if demo.name === demoObj.current}
+        <demo.component />
+      {/if}
+    {/each}
+  {:else}
+    {#each demos as demo}
+      <div class="demo-entry">
+        <h2>{demo.title}</h2>
+        <p>{demo.description}</p>
+        <button onclick={() => navigateToDemo(demo.name)}>查看 {demo.title}</button>
+      </div>
+    {/each}
+  {/if}
 </main>
 
 <style>
   main {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .demo-entry {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    width: 100vw;
+    justify-content: space-between;
   }
-  .top-bar {
-    flex-shrink: 0;
+
+  .demo-entry h2 {
+    margin-top: 0;
+    color: #333;
   }
-  /* 只对 Panel2 的根元素应用 flex: 1; */
-  .panel-container {
-    flex: 1;
+
+  .demo-entry p {
+    color: #666;
+    flex-grow: 1;
+  }
+
+  .demo-entry button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+  }
+
+  .demo-entry button:hover {
+    background-color: #0056b3;
   }
 </style>

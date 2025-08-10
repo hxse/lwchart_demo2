@@ -1,16 +1,14 @@
 <script>
   import { tick } from "svelte";
   import Split from "split-grid";
-  import {
-    parseGridTemplateAreas,
-    calculateSplitData,
-    getUniqueArray,
-    calculateGridAreas,
-    transformGridAreas,
-    formatGridArea,
-    generateHslColors,
-    insertSplitSize,
-  } from "./utils/grid-utils.js";
+  import { getUniqueArray } from "./utils/array-utils.js";
+  import { insertSplitSize } from "./utils/grid-template-utils.js";
+  import { parseGridTemplateAreas } from "./utils/grid-area-parser.js";
+  import { calculateSplitData } from "./utils/grid-split-calculator.js";
+  import { calculateGridAreas } from "./utils/grid-area-calculator.js";
+  import { transformGridAreas } from "./utils/grid-area-transformer.js";
+  import { formatGridArea } from "./utils/grid-area-formatter.js";
+  import { generateHslColors } from "./utils/color-generator.js";
 
   // 1. 获取所有响应式 props
   let props = $props();
