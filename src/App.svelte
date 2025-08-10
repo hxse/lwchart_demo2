@@ -1,5 +1,6 @@
 <script>
   import PanelDemo from "./demo/PanelDemo.svelte";
+  import LWChartDemo from "./demo/LWChartDemo.svelte";
   import { onMount } from "svelte";
   import { setContext } from "svelte";
 
@@ -13,6 +14,12 @@
       component: PanelDemo,
       title: "Panel Demo",
       description: "简单的Panel组件演示",
+    },
+    {
+      name: "LWChartDemo",
+      component: LWChartDemo,
+      title: "LWChart Demo",
+      description: "简单的LWChartDemo组件演示",
     },
   ];
 
