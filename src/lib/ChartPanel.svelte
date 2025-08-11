@@ -1,11 +1,9 @@
 <script>
-  import Panel from "../lib/Panel.svelte";
-  import Text from "./Text.svelte";
-  import { removeURLParameter, returnHome } from "./utils/handleUrl.js";
+  import Panel from "./Panel.svelte";
+  import LWChart from "./LWChart.svelte";
 
-  import { getContext } from "svelte";
-
-  const demoObj = getContext("demoObj");
+  let props = $props();
+  let options = $derived(props.options);
 
   let panelOptions1 = {
     template: `a a b
@@ -14,8 +12,8 @@
     splitSize: "5px",
     gridTemplateColumns: "1fr 1fr 1fr",
     gridTemplateRows: "1fr 1fr 1fr",
-    showDefaultColors: true,
-    children: [...Array(5).keys()].map((i) => ({ component: Text, props: { text: `layout 0 test ${i}` } })),
+    showDefaultColors: false,
+    children: [...Array(5).keys()].map((i) => ({ component: LWChart, props: { options } })),
   };
 
   let panelOptions2 = {
@@ -24,8 +22,8 @@
     splitSize: "5px",
     gridTemplateColumns: "1fr 1fr",
     gridTemplateRows: "1fr 1fr",
-    showDefaultColors: true,
-    children: [...Array(3).keys()].map((i) => ({ component: Text, props: { text: `layout 1 test ${i}` } })),
+    showDefaultColors: false,
+    children: [...Array(3).keys()].map((i) => ({ component: LWChart, props: { options } })),
   };
 
   let panelOptions = $state(panelOptions1);
@@ -57,29 +55,13 @@
   }
 </script>
 
-<div class="container">
-  <div class="top-bar">
-    <button onclick={() => returnHome(demoObj)}> 返回主页 </button>
-    <button onclick={changeTemplate}>更改布局</button>
-  </div>
-  <div class="panel">
-    <Panel {...panelOptions} />
-  </div>
+<div class="chart">
+  <Panel {...panelOptions} style="width: 100%; height: 100%;" />
 </div>
 
 <style>
-  .container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100vw;
-  }
-  .top-bar {
-    flex-shrink: 0;
-  }
-  /* 只对 Panel2 的根元素应用 flex: 1; */
-  .panel {
-    flex: 1;
-    overflow: hidden; /* 防止内容溢出影响高度 */
+  .chart {
+    width: 100%;
+    height: 100%;
   }
 </style>

@@ -75,11 +75,15 @@
     grid-template-rows: ${finalGridTemplateRows};
     height: 100%;
     width: 100%;
+
   `}
 >
   {#each uniqueTemplateArray as item, index (item)}
     {@const Component = props.children[index].component}
-    <div class={item} style="grid-area: {formatGridArea(templateGrid[item])}; background-color: {hlsColors[index]};">
+    <div
+      class={item}
+      style="overflow: hidden; grid-area: {formatGridArea(templateGrid[item])}; background-color: {hlsColors[index]}; "
+    >
       <Component {...props.children[index].props} />
     </div>
   {/each}

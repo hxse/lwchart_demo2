@@ -1,7 +1,5 @@
 <script>
-  import Panel from "../lib/Panel.svelte";
-  import Text from "./Text.svelte";
-  import LWChart from "../lib/LWChart.svelte";
+  import ChartPanel from "../lib/ChartPanel.svelte";
   import { generateCandlestickData, simulateVolume, calculateSMA, calculateRSI } from "./utils/generateMockData.js";
   import { removeURLParameter, returnHome } from "./utils/handleUrl.js";
   import { getContext } from "svelte";
@@ -80,7 +78,7 @@
     <button onclick={replaceData}>替换k线</button>
   </div>
   <div class="chart">
-    <LWChart {options} />
+    <ChartPanel {options} />
   </div>
 </div>
 

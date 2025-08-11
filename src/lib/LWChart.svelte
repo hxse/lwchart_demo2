@@ -4,6 +4,7 @@
   import Panel from "./Panel.svelte";
   import { calculateGridAreas } from "./utils/grid-area-calculator";
   import { resolveDataUpdate } from "./utils/array-utils";
+  import { debounce } from "./utils/debounce";
 
   let props = $props();
   let options = $derived(props.options);
@@ -13,14 +14,19 @@
   const seriesMap = new Map();
   let resizeObserver;
 
-  function resizeChart(fault = 0.6) {
+  function resizeChart(fault = 1) {
     if (chart && chartContainer) {
       chart.resize(chartContainer.clientWidth - fault, chartContainer.clientHeight - fault);
       chart.timeScale().fitContent();
     }
   }
+  const debouncedResizeChart = debounce(resizeChart, 200); // 200毫秒延迟
 
   onMount(() => {
+    if (!options) {
+      throw new Error("Options are required but were not provided.");
+    }
+
     if (!chartContainer) return;
 
     const chartOptions = {
@@ -40,7 +46,7 @@
     resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
         if (entry.target === chartContainer) {
-          resizeChart();
+          debouncedResizeChart();
         }
       }
     });
@@ -149,4 +155,13 @@
   });
 </script>
 
-<div bind:this={chartContainer} style="width: 100%; height: 100%;"></div>
+<div class="chart">
+  <div bind:this={chartContainer} style="width: 100%; height: 100%;"></div>
+</div>
+
+<style>
+  .chart {
+    width: 100%;
+    height: 100%;
+  }
+</style>
