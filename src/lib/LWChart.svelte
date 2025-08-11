@@ -7,12 +7,20 @@
   let props = $props();
   let options = $derived(props.options);
 
-  let container;
+  let chartContainer;
   let chart;
   const seriesMap = new Map();
+  let resizeObserver;
+
+  function resizeChart(fault = 0.6) {
+    if (chart && chartContainer) {
+      chart.resize(chartContainer.clientWidth - fault, chartContainer.clientHeight - fault);
+      chart.timeScale().fitContent();
+    }
+  }
 
   onMount(() => {
-    if (!container) return;
+    if (!chartContainer) return;
 
     const chartOptions = {
       addDefaultPane: false,
@@ -22,13 +30,28 @@
         },
       },
     };
-    chart = createChart(container, chartOptions);
+    chart = createChart(chartContainer, chartOptions);
 
-    // 4. 确保图表内容自适应
-    chart.timeScale().fitContent();
+    // 初始尺寸调整
+    resizeChart();
 
-    // 确保在组件销毁时清理图表
-    return () => chart.remove();
+    // 监听 chartContainer 尺寸变化
+    resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        if (entry.target === chartContainer) {
+          resizeChart();
+        }
+      }
+    });
+    resizeObserver.observe(chartContainer);
+
+    // 确保在组件销毁时清理图表和 ResizeObserver
+    return () => {
+      chart.remove();
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+    };
   });
 
   // 使用 $effect 监听 options 的变化
@@ -102,4 +125,4 @@
   });
 </script>
 
-<div bind:this={container} style="width: 100%; height: 100%;"></div>
+<div bind:this={chartContainer} style="width: 100%; height: 100%;"></div>

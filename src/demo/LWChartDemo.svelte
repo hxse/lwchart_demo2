@@ -55,5 +55,7 @@
   /* 只对 Panel2 的根元素应用 flex: 1; */
   .chart {
     flex: 1;
+    height: 100%;
+    width: 100%;
   }
 </style>
