@@ -3,6 +3,7 @@
   import { createChart, CandlestickSeries, HistogramSeries, LineSeries, ColorType } from "lightweight-charts";
   import Panel from "./Panel.svelte";
   import { calculateGridAreas } from "./utils/grid-area-calculator";
+  import { resolveDataUpdate } from "./utils/array-utils";
 
   let props = $props();
   let options = $derived(props.options);
@@ -56,6 +57,8 @@
 
   // 使用 $effect 监听 options 的变化
   $effect(() => {
+    console.log("进入effect 1");
+
     // 1. 根据 options 移除不再显示的系列
     // 移除放在添加之前,否则会出问题
     for (const [key, { series, pane, index }] of seriesMap.entries()) {
@@ -101,17 +104,38 @@
           }
 
           if (series) {
+            // const _data = value.data;
+            const _newData = [...value.data];
             seriesMap.set(key, {
               series,
               pane,
               index: value.index,
+              data: _newData,
             });
-          }
-        }
 
-        // 确保数据已设置或更新
-        const { series } = seriesMap.get(key);
-        series.setData(value.data);
+            // 确保数据已设置或更新
+            series.setData(_newData);
+            console.log("update data 1");
+          }
+        } else {
+          // 确保数据已设置或更新
+          const { series, data } = seriesMap.get(key);
+          const updateState = resolveDataUpdate(data, value.data);
+          const _newData = [...value.data];
+
+          if (updateState === "setData") {
+            series.setData(_newData);
+            // 更新 seriesMap 中的数据副本
+            seriesMap.get(key).data = _newData;
+          }
+
+          if (updateState === "updateData") {
+            series.update({ ..._newData[_newData.length - 1] });
+            // 更新 seriesMap 中的数据副本
+            seriesMap.get(key).data = _newData;
+          }
+          console.log("update data 2", updateState, key, _newData[_newData.length - 1].close);
+        }
       }
     }
 
