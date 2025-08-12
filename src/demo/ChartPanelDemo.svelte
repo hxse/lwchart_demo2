@@ -1,10 +1,26 @@
 <script>
   import ChartPanel from "../lib/ChartPanel.svelte";
+  import { initPanelSelectOptions } from "../lib/initPanelSelectOptions";
   import { generateCandlestickData, simulateVolume, calculateSMA, calculateRSI } from "./utils/generateMockData.js";
   import { removeURLParameter, returnHome } from "./utils/handleUrl.js";
-  import { getContext } from "svelte";
+  import { syncChartsCrosshair } from "../lib/utils/chart-utils";
+  import { getContext, onMount, setContext } from "svelte";
+
+  // 创建一个响应式数组，用于收集所有子组件的图表实例。
+  const myCharts = $state([]);
+  // 将该数组放入 Svelte Context，以便所有子组件都能访问和修改。
+  setContext("myCharts", myCharts);
+  // 使用 Map 来保存每个图表的监听器函数，以便在更新时能够准确移除。
 
   const demoObj = getContext("demoObj");
+
+  $effect(() => {
+    syncChartsCrosshair(myCharts);
+  });
+
+  let panelSelectOptions = $state(initPanelSelectOptions);
+
+  let panelSelect = $state(panelSelectOptions[2]);
 
   function getIndicators() {
     const candleData = generateCandlestickData(200, "15m");
@@ -72,13 +88,20 @@
 <div class="container">
   <div class="top-bar">
     <button onclick={() => returnHome(demoObj)}> 返回主页 </button>
+    <select bind:value={panelSelect} onchange={() => {}}>
+      {#each panelSelectOptions as opt}
+        <option value={opt}>
+          {opt.name}
+        </option>
+      {/each}
+    </select>
     <button onclick={toggleIndicators}>切换指标 </button>
     <button onclick={updateClose}>更新收盘价</button>
     <button onclick={addDataPoint}>新增k线</button>
     <button onclick={replaceData}>替换k线</button>
   </div>
   <div class="chart">
-    <ChartPanel {options} />
+    <ChartPanel {options} {panelSelect} />
   </div>
 </div>
 

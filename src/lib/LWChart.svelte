@@ -4,7 +4,10 @@
   import Panel from "./Panel.svelte";
   import { calculateGridAreas } from "./utils/grid-area-calculator";
   import { resolveDataUpdate } from "./utils/array-utils";
-  import { debounce } from "./utils/debounce";
+  import { debounce } from "./utils/chart-utils";
+  import { getContext, setContext } from "svelte";
+
+  const myCharts = getContext("myCharts");
 
   let props = $props();
   let options = $derived(props.options);
@@ -20,7 +23,7 @@
       chart.timeScale().fitContent();
     }
   }
-  const debouncedResizeChart = debounce(resizeChart, 200); // 200毫秒延迟
+  const debouncedResizeChart = debounce(resizeChart, 60);
 
   onMount(() => {
     if (!options) {
@@ -39,6 +42,8 @@
     };
     chart = createChart(chartContainer, chartOptions);
 
+    myCharts.push({ chart, seriesMap });
+
     // 初始尺寸调整
     resizeChart();
 
@@ -54,9 +59,16 @@
 
     // 确保在组件销毁时清理图表和 ResizeObserver
     return () => {
+      // 1. 移除图表实例
       chart.remove();
+      // 2. 断开 ResizeObserver
       if (resizeObserver) {
         resizeObserver.disconnect();
+      }
+      // 3. 找到并从 myCharts 数组中移除当前图表的条目
+      const index = myCharts.findIndex((item) => item.chart === chart);
+      if (index > -1) {
+        myCharts.splice(index, 1);
       }
     };
   });
@@ -107,6 +119,8 @@
             });
           } else if (["sma", "rsi"].includes(key)) {
             series = pane.addSeries(LineSeries, {});
+          } else {
+            throw new Error(`Unsupported series type: ${key}`);
           }
 
           if (series) {

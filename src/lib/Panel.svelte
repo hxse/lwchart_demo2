@@ -75,7 +75,6 @@
     grid-template-rows: ${finalGridTemplateRows};
     height: 100%;
     width: 100%;
-
   `}
 >
   {#each uniqueTemplateArray as item, index (item)}
